@@ -28,15 +28,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 4️⃣ Build frontend image
+      # 4️⃣ Build frontend image  ✅ FIXED
       - name: Build frontend Docker image
-        run: |
-          docker build \-t ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest ./AngularFrontend
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest ./AngularFrontend
 
       # 5️⃣ Build backend image
       - name: Build backend Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest ./NodeBackend
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest ./NodeBackend
 
       # 6️⃣ Push images to Docker Hub
       - name: Push Docker images
@@ -61,7 +59,6 @@ jobs:
               git pull origin main
             fi
             cd app
-            # Pull the latest images from Docker Hub
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest
             docker-compose down
