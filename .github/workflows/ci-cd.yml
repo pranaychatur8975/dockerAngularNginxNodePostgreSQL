@@ -55,7 +55,7 @@ jobs:
           script: |
             cd /home/ubuntu
             if [ ! -d app/.git ]; then
-              git clone https://github.com/<your-username>/<your-repo>.git app
+              git clone https://github.com/pranaychatur8975/dockerAngularNginxNodePostgreSQL.git app
             else
               cd app
               git pull origin main
