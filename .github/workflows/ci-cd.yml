@@ -34,13 +34,17 @@ jobs:
           echo "AngularFrontend folder:"
           ls -la AngularFrontend
 
-      # 4️⃣ Build frontend image (explicit Dockerfile)
+      # 4️⃣ Build frontend image (force classic builder)
       - name: Build frontend Docker image
-        run: docker build -f AngularFrontend/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest AngularFrontend
+        run: |
+          docker buildx use default || true
+          docker build -f AngularFrontend/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest AngularFrontend
 
-      # 5️⃣ Build backend image (explicit Dockerfile)
+      # 5️⃣ Build backend image (force classic builder)
       - name: Build backend Docker image
-        run: docker build -f NodeBackend/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest NodeBackend
+        run: |
+          docker buildx use default || true
+          docker build -f NodeBackend/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest NodeBackend
 
       # 6️⃣ Push images to Docker Hub
       - name: Push Docker images
