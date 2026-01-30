@@ -35,8 +35,8 @@ jobs:
           ls -la AngularFrontend
 
       # 4️⃣ Build frontend image (explicit Dockerfile)
-      - name: Build frontend Docker image
-        run: docker build -f AngularFrontend/Dockerfile -t angular-frontend . ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest AngularFrontend
+      - name: Build frontend Docker image 
+        run: docker build -t pranaychatur/angular-frontend ./AngularFrontend ${{ secrets.DOCKERHUB_USERNAME }}/angular-frontend:latest AngularFrontend
 
       # 5️⃣ Build backend image (explicit Dockerfile)
       - name: Build backend Docker image
