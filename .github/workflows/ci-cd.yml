@@ -1,0 +1,73 @@
+name: CI-CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ DockerHub login
+      - name: DockerHub login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # 3️⃣ Debug AngularFrontend folder (optional but recommended)
+      - name: Debug AngularFrontend folder
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Repo root files:"
+          ls -la
+          echo "AngularFrontend folder:"
+          ls -la AngularFrontend
+
+      # 4️⃣ Build frontend image (explicit Dockerfile)
+      - name: Build frontend Docker image 
+        run: docker build -t pranaychatur/angular-frontend:latest ./AngularFrontend
+
+      # 5️⃣ Build backend image (explicit Dockerfile)
+      - name: Build backend Docker image
+        run: docker build -t pranaychatur/node-backend:latest ./NodeBackend
+        
+      # 6️⃣ Push images to Docker Hub
+      - name: Push Docker images
+        run: |
+          docker push pranaychatur/angular-frontend:latest
+          docker push pranaychatur/node-backend:latest
+
+      # 7️⃣ Deploy to remote server via SSH
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home/ubuntu
+            if [ ! -d app/.git ]; then
+              git clone https://github.com/pranaychatur8975/dockerAngularNginxNodePostgreSQL.git app
+            else
+              cd app
+              git pull origin main
+            fi
+            cd app
+            # Pull the latest Docker images from Docker Hub
+            docker pull pranaychatur/angular-frontend:latest
+            docker pull pranaychatur/node-backend:latest
+            docker-compose down
+            docker-compose up -d
+            docker ps
